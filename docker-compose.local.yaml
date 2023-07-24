@@ -3,13 +3,13 @@ version: "3"
 services:
 
   api:
-#    build:
-#      dockerfile: Dockerfile.local
+    build:
+      dockerfile: Dockerfile.local
     restart: unless-stopped
     environment:
       PHP_IDE_CONFIG: "serverName=Docker"
-#    depends_on:
-#      - mysql
+    #    depends_on:
+    #      - mysql
     networks:
       courselab:
         ipv4_address: ${API_IPV4}
