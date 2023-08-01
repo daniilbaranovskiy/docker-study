@@ -6,7 +6,12 @@ services:
     build:
       dockerfile: Dockerfile.local
     restart: unless-stopped
+    volumes:
+      - ./docker/api/php/config/docker-xdebug.ini:/usr/local/etc/php/conf.d/docker-xdebug.ini
     environment:
+      XDEBUG_CONFIG: "client_host=172.22.75.1"
+      XDEBUG_SESSION: 1
+      XDEBUG_MODE: debug
       PHP_IDE_CONFIG: "serverName=Docker"
     #    depends_on:
     #      - mysql
