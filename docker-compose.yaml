@@ -7,7 +7,7 @@ services:
       context: ./docker/api/
     container_name: ${PROJECT_NAME}-api
     volumes:
-      - ./api:${API_DIRECTORY}
+      - ./apicustom:${API_DIRECTORY}
     networks:
       - ${PROJECT_NAME}
 
