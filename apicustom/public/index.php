@@ -17,7 +17,7 @@ $database = new Database($CoreParams['Database']['Host'],
 $database->connect();
 //Побудова запиту до бд
 $query = new QueryBuilder();
-$query->from('news')->update(['title' => 'uptest', 'text' => 'uptext', 'date' => '2023-08-06 15:00:00'])->where(['id' => 13]);
+$query->from('news')->delete()->where(['id' => 11]);
 //Виконання запиту до бд
 $rows = $database->execute($query);
 ////Створення об'єкту класу FrontController

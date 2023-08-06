@@ -55,6 +55,12 @@ class QueryBuilder
                     $sql .= " WHERE $this->where";
                 return $sql;
                 break;
+            case "delete":
+                $sql = "DELETE FROM {$this->table}";
+                if (!empty($this->where))
+                    $sql .= " WHERE $this->where";
+                return $sql;
+                break;
         }
     }
     //Метод where(
@@ -89,6 +95,7 @@ class QueryBuilder
         $this->params = $data;
         return $this;
     }
+
     //Метод update призначений для побудови SQL-запиту для оновлення даних в таблицю бази даних.
     public function update($data)
     {
@@ -103,6 +110,12 @@ class QueryBuilder
         }
         //Об'єднуємо всі частини запиту, які містяться у масиві $set_parts, в один рядок, розділений комами.
         $this->set = implode(', ', $set_parts);
+        return $this;
+    }
+    // //Метод delete призначений для видалення даних з таблиці бази даних.
+    public function delete()
+    {
+        $this->type = "delete";
         return $this;
     }
 
