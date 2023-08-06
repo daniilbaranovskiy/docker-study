@@ -9,6 +9,7 @@ class QueryBuilder
     protected $where;
     protected $params;
     protected $values;
+    protected $set;
 
     //Конструктор класу
     public function __construct()
@@ -33,7 +34,7 @@ class QueryBuilder
         $this->table = $table;
         return $this;
     }
-    //Метод getSql(Цей метод повертає побудований SQL-запит згідно з налаштуваними параметрами. Залежно від типу запиту (у цьому випадку "select"), будується відповідний SQL-запит.
+    //Метод getSql(Цей метод повертає побудований SQL-запит згідно з налаштуваними параметрами. Залежно від типу запиту (у цьому випадку "select" або "update"), будується відповідний SQL-запит.
     //У випадку використання умови WHERE, вона додається до SQL-запиту.)
     public function getSql()
     {
@@ -46,6 +47,12 @@ class QueryBuilder
                 break;
             case "insert":
                 $sql = "INSERT INTO {$this->table} {$this->fields} VALUES {$this->values}";
+                return $sql;
+                break;
+            case "update":
+                $sql = "UPDATE {$this->table} SET {$this->set}";
+                if (!empty($this->where))
+                    $sql .= " WHERE $this->where";
                 return $sql;
                 break;
         }
@@ -80,6 +87,22 @@ class QueryBuilder
         $this->values = "($values)";
         //Тут зберігаються дані, які будуть вставлені в таблицю бази даних. Вони зберігаються у властивості $params,
         $this->params = $data;
+        return $this;
+    }
+    //Метод update призначений для побудови SQL-запиту для оновлення даних в таблицю бази даних.
+    public function update($data)
+    {
+        $this->type = "update";
+        //Створюється порожній масив, який буде містити частини запиту для оновлення даних.
+        $set_parts = [];
+        //Проходимо по переданому масиву $data, який містить дані для оновлення.
+        foreach ($data as $key => $value) {
+            //Додаємо частину запиту "column_name = :column_name" для кожної пари "ключ-значення" в масив $set_parts.
+            $set_parts[] = "{$key} = :{$key}";
+            $this->params[$key] = $value;
+        }
+        //Об'єднуємо всі частини запиту, які містяться у масиві $set_parts, в один рядок, розділений комами.
+        $this->set = implode(', ', $set_parts);
         return $this;
     }
 
