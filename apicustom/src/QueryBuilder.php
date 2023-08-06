@@ -8,6 +8,7 @@ class QueryBuilder
     protected $table;
     protected $where;
     protected $params;
+    protected $values;
 
     //Конструктор класу
     public function __construct()
@@ -43,6 +44,10 @@ class QueryBuilder
                     $sql .= " WHERE $this->where";
                 return $sql;
                 break;
+            case "insert":
+                $sql = "INSERT INTO {$this->table} {$this->fields} VALUES {$this->values}";
+                return $sql;
+                break;
         }
     }
     //Метод where(
@@ -56,6 +61,25 @@ class QueryBuilder
             $this->params[$key] = $value;
         }
         $this->where = implode('AND', $where_parts);
+        return $this;
+    }
+
+    //Метод insert призначений для побудови SQL-запиту типу INSERT INTO для вставки даних в таблицю бази даних.
+    public function insert($data)
+    {
+        $this->type = "insert";
+        //Тут створюється рядок, який містить імена стовпців, до яких будуть вставлені дані.
+        $columns = implode(',', array_keys($data));
+        //У цьому рядку створюється рядок з позначеннями параметрів для підготовлених запитів.
+        $values = implode(',', array_map(function ($value) {
+            return ':' . $value;
+        }, array_keys($data)));
+        //Тут зберігається рядок з іменами стовпців, отриманими на попередньому кроці.
+        $this->fields = "($columns)";
+        //Тут зберігається рядок з позначеннями параметрів для підготовлених запитів.
+        $this->values = "($values)";
+        //Тут зберігаються дані, які будуть вставлені в таблицю бази даних. Вони зберігаються у властивості $params,
+        $this->params = $data;
         return $this;
     }
 

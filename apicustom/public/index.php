@@ -17,12 +17,9 @@ $database = new Database($CoreParams['Database']['Host'],
 $database->connect();
 //Побудова запиту до бд
 $query = new QueryBuilder();
-$query->from('news')
-    ->select(["title", "text"])
-    ->where(['id' => 5]);
+$query->from('news')->insert(['title' => 'intest', 'text' => 'intext', 'date' => '2023-08-06 14:00:00']);
 //Виконання запиту до бд
 $rows = $database->execute($query);
-var_dump($rows);
 ////Створення об'єкту класу FrontController
 //$front_controller = new FrontController();
 ////Виклик методу run
