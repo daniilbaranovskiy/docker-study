@@ -10,11 +10,22 @@ class QueryBuilder
     protected $params;
     protected $values;
     protected $set;
+    protected $joins = [];
 
     //Конструктор класу
     public function __construct()
     {
         $this->params = [];
+    }
+    //Цей метод дозволяє додавати різні типи JOIN операцій до запиту.
+    public function join($table, $on, $type = 'INNER')
+    {
+        $this->joins[] = [
+            'table' => $table,
+            'on' => $on,
+            'type' => $type
+        ];
+        return $this;
     }
     //Метод select(Цей метод встановлює тип запиту як "select" та визначає поля для вибірки. Параметр $fields може бути рядком з переліком полів, розділених комами, або масивом полів.
     //Після визначення полів, вони зберігаються у властивості $fields. Метод повертає об'єкт $this для підтримки ланцюжкового інтерфейсу.)
@@ -41,6 +52,9 @@ class QueryBuilder
         switch ($this->type) {
             case "select":
                 $sql = "SELECT {$this->fields} FROM {$this->table}";
+                foreach ($this->joins as $join) {
+                    $sql .= " {$join['type']} JOIN {$join['table']} ON {$join['on']}";
+                }
                 if (!empty($this->where))
                     $sql .= " WHERE $this->where";
                 return $sql;
@@ -112,6 +126,7 @@ class QueryBuilder
         $this->set = implode(', ', $set_parts);
         return $this;
     }
+
     // //Метод delete призначений для видалення даних з таблиці бази даних.
     public function delete()
     {

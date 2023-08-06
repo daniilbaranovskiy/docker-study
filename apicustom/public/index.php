@@ -17,9 +17,13 @@ $database = new Database($CoreParams['Database']['Host'],
 $database->connect();
 //Побудова запиту до бд
 $query = new QueryBuilder();
-$query->from('news')->delete()->where(['id' => 11]);
+$query->from('news')
+    ->join('categories', 'news.category_id = categories.id', 'INNER')
+    ->select(['news.title', 'categories.name'])
+    ->where(['category_id' => 1]);
 //Виконання запиту до бд
 $rows = $database->execute($query);
+var_dump($rows);
 ////Створення об'єкту класу FrontController
 //$front_controller = new FrontController();
 ////Виклик методу run
