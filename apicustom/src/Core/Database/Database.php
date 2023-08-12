@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Core\Database;
+
+use PDO;
+
 class Database
 {
     //Оголошення властивостей класу
@@ -7,7 +11,7 @@ class Database
     protected $username;
     protected $password;
     protected $dbname;
-    protected PDO $pdo;
+    protected \PDO $pdo;
 
     //Конструктор класу(Конструктор отримує дані для підключення до бази даних і ініціалізує властивості класу.)
     public function __construct($host, $username, $password, $dbname)
@@ -45,6 +49,5 @@ class Database
         foreach ($params as $key => $value)
             $sth->bindValue($key, $value);
         $sth->execute();
-        return $sth->fetchAll();
     }
 }

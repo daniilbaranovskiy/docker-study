@@ -1,5 +1,6 @@
 <?php
 
+namespace App\Core\Database;
 class QueryBuilder
 {
     //Оголошення властивостей класу
@@ -17,6 +18,7 @@ class QueryBuilder
     {
         $this->params = [];
     }
+
     //Цей метод дозволяє додавати різні типи JOIN операцій до запиту.
     public function join($table, $on, $type = 'INNER')
     {
@@ -29,7 +31,7 @@ class QueryBuilder
     }
     //Метод select(Цей метод встановлює тип запиту як "select" та визначає поля для вибірки. Параметр $fields може бути рядком з переліком полів, розділених комами, або масивом полів.
     //Після визначення полів, вони зберігаються у властивості $fields. Метод повертає об'єкт $this для підтримки ланцюжкового інтерфейсу.)
-    public function select($fields = "*")
+    public function select(string $fields = "*"): self
     {
         $this->type = "select";
         $fields_string = $fields;
@@ -40,7 +42,7 @@ class QueryBuilder
     }
     //Метод from(Цей метод встановлює таблицю, з якої будуть вибиратися дані. Властивість $table зберігає ім'я таблиці.
     //Метод також повертає об'єкт $this для підтримки ланцюжкового інтерфейсу.)
-    public function from($table)
+    public function from($table): self
     {
         $this->table = $table;
         return $this;
@@ -80,7 +82,7 @@ class QueryBuilder
     //Метод where(
     //Цей метод додає умову WHERE до SQL-запиту. Вхідний параметр $where є асоціативним масивом, де ключі представляють імена полів, а значення - значення для умови.
     //Метод генерує умову WHERE, додаючи імена полів та параметри до масиву $where_parts, а також додає відповідні параметри до масиву $params, який використовується для підготовки запиту з використанням об'єкта PDO.)
-    public function where($where)
+    public function where($where): self
     {
         $where_parts = [];
         foreach ($where as $key => $value) {
@@ -92,13 +94,14 @@ class QueryBuilder
     }
 
     //Метод insert призначений для побудови SQL-запиту типу INSERT INTO для вставки даних в таблицю бази даних.
-    public function insert($data)
+    public function insert($data, $table): self
     {
         $this->type = "insert";
+        $this->table = $table;
         //Тут створюється рядок, який містить імена стовпців, до яких будуть вставлені дані.
-        $columns = implode(',', array_keys($data));
+        $columns = implode(', ', array_keys($data));
         //У цьому рядку створюється рядок з позначеннями параметрів для підготовлених запитів.
-        $values = implode(',', array_map(function ($value) {
+        $values = implode(', ', array_map(function ($value) {
             return ':' . $value;
         }, array_keys($data)));
         //Тут зберігається рядок з іменами стовпців, отриманими на попередньому кроці.
@@ -111,7 +114,7 @@ class QueryBuilder
     }
 
     //Метод update призначений для побудови SQL-запиту для оновлення даних в таблицю бази даних.
-    public function update($data)
+    public function update($data): self
     {
         $this->type = "update";
         //Створюється порожній масив, який буде містити частини запиту для оновлення даних.
@@ -128,14 +131,14 @@ class QueryBuilder
     }
 
     // //Метод delete призначений для видалення даних з таблиці бази даних.
-    public function delete()
+    public function delete(): self
     {
         $this->type = "delete";
         return $this;
     }
 
     //Метод getParams(Цей метод повертає масив параметрів, який буде використовуватися для підготовки запиту з використанням об'єкта PDO.)
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
