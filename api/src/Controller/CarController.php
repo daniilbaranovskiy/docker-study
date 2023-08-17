@@ -97,7 +97,7 @@ class CarController extends AbstractController
      * @throws Exception
      */
     #[Route('car-update/{id}', name: 'car_update_item')]
-    public function carBrand(string $id): JsonResponse
+    public function updateCar(string $id): JsonResponse
     {
         /** @var Car $car */
         $car = $this->entityManager->getRepository(Car::class)->find($id);
@@ -114,7 +114,7 @@ class CarController extends AbstractController
      * @throws Exception
      */
     #[Route('car-delete/{id}', name: 'car_delete_item')]
-    public function deleteBrand(string $id): JsonResponse
+    public function deleteCar(string $id): JsonResponse
     {
         /** @var Car $car */
         $car = $this->entityManager->getRepository(Car::class)->find($id);
