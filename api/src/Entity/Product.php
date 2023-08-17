@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
@@ -23,6 +24,15 @@ class Product implements JsonSerializable
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
+    private ?Category $category = null;
+
+    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
+    private ?ProductInfo $productInfo = null;
+
+    #[ORM\ManyToMany(targetEntity: Test::class)]
+    private Collection $test;
 
     /**
      * @return int|null
@@ -95,9 +105,60 @@ class Product implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            "name" => $this->getName(),
-            "price" => $this->getPrice(),
-            "description" => $this->getDescription()
+            "id"          => $this->getId(),
+            "name"        => $this->getName(),
+            "price"       => $this->getPrice(),
+            "description" => $this->getDescription(),
+            "category"    => $this->getCategory()
         ];
     }
+
+    /**
+     * @return Category|null
+     */
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param Category|null $category
+     */
+    public function setCategory(?Category $category): void
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return ProductInfo|null
+     */
+    public function getProductInfo(): ?ProductInfo
+    {
+        return $this->productInfo;
+    }
+
+    /**
+     * @param ProductInfo|null $productInfo
+     */
+    public function setProductInfo(?ProductInfo $productInfo): void
+    {
+        $this->productInfo = $productInfo;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getTest(): Collection
+    {
+        return $this->test;
+    }
+
+    /**
+     * @param Collection $test
+     */
+    public function setTest(Collection $test): void
+    {
+        $this->test = $test;
+    }
+
 }
