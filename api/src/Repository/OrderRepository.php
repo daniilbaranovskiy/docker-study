@@ -20,4 +20,18 @@ class OrderRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Order::class);
     }
+
+    /**
+     * @param int $customer_id
+     * @return float|int|mixed|string
+     */
+    public function getAllOrdersByCustomerId(int $customer_id)
+    {
+        return $this->createQueryBuilder('o')
+            ->join('o.customer', 'c')
+            ->andWhere("c.id = :customer_id")
+            ->setParameter("customer_id", $customer_id)
+            ->getQuery()
+            ->getResult();
+    }
 }

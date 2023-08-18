@@ -20,4 +20,17 @@ class CustomerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Customer::class);
     }
+
+    /**
+     * @param string $lastname
+     * @return float|int|mixed|string
+     */
+    public function getAllCustomersByLastName(string $lastname)
+    {
+        return $this->createQueryBuilder("customer")
+            ->andWhere("customer.lastname LIKE :lastname")
+            ->setParameter("lastname", "%" . $lastname . "%")
+            ->getQuery()
+            ->getResult();
+    }
 }

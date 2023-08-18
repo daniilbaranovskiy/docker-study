@@ -57,6 +57,16 @@ class BrandController extends AbstractController
         $brands = $this->entityManager->getRepository(Brand::class)->findAll();
         return new JsonResponse($brands);
     }
+
+    /**
+     * @return JsonResponse
+     */
+    #[Route('brand-name', name: 'brand_name')]
+    public function getBrandByName(): JsonResponse
+    {
+        $brands = $this->entityManager->getRepository(Brand::class)->getAllBrandByName("AUDI");
+        return new JsonResponse($brands);
+    }
     /**
      * @param string $id
      * @return JsonResponse

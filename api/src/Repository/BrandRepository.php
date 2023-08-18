@@ -20,4 +20,17 @@ class BrandRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Brand::class);
     }
+
+    /**
+     * @param string $name
+     * @return float|int|mixed|string
+     */
+    public function getAllBrandByName(string $name)
+    {
+        return $this->createQueryBuilder("brand")
+            ->andWhere("brand.name LIKE :name")
+            ->setParameter("name", "%" . $name . "%")
+            ->getQuery()
+            ->getResult();
+    }
 }

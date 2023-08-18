@@ -75,6 +75,16 @@ class CarController extends AbstractController
         $cars = $this->entityManager->getRepository(Car::class)->findAll();
         return new JsonResponse($cars);
     }
+
+    /**
+     * @return JsonResponse
+     */
+    #[Route('car-fuel', name: 'car_fuel')]
+    public function getCarByFuelType(): JsonResponse
+    {
+        $cars = $this->entityManager->getRepository(Car::class)->getAllCarByFuelType("disel");
+        return new JsonResponse($cars);
+    }
     /**
      * @param string $id
      * @return JsonResponse

@@ -20,4 +20,18 @@ class CarRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Car::class);
     }
+
+    /**
+     * @param string $fuel_type
+     * @return float|int|mixed|string
+     */
+    public function getAllCarByFuelType(string $fuel_type)
+    {
+        return $this->createQueryBuilder("car")
+            ->andWhere("car.fuel_type LIKE :fuel_type")
+            ->setParameter("fuel_type", "%" . $fuel_type . "%")
+            ->getQuery()
+            ->getResult();
+    }
+
 }

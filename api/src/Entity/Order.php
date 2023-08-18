@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
+#[ORM\Table('`order')]
 class Order implements JsonSerializable
 {
     #[ORM\Id]
