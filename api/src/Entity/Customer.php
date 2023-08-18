@@ -10,26 +10,47 @@ use JsonSerializable;
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 class Customer implements JsonSerializable
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $firstname = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $address = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $number = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+    /**
+     * @var Collection
+     */
     #[ORM\OneToMany(mappedBy: "customer", targetEntity: Order::class)]
     private Collection $customer;
 

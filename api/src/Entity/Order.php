@@ -12,19 +12,34 @@ use JsonSerializable;
 #[ORM\Table('`order')]
 class Order implements JsonSerializable
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * @var DateTimeInterface|null
+     */
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?DateTimeInterface $order_date = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: '0')]
     private ?string $order_sum = null;
 
+    /**
+     * @var Car|null
+     */
     #[ORM\ManyToOne(targetEntity: Car::class, inversedBy: "car")]
     private ?Car $car = null;
+    /**
+     * @var Customer|null
+     */
     #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: "customer")]
     private ?Customer $customer = null;
 

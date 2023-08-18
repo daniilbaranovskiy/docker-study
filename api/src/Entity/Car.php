@@ -11,32 +11,56 @@ use JsonSerializable;
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 class Car implements JsonSerializable
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $year = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
     private ?string $price = null;
 
     #[ORM\Column]
     private ?int $quantity = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $fuel_type = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $transmission = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $color = null;
 
+    /**
+     * @var Model|null
+     */
     #[ORM\ManyToOne(targetEntity: Model::class, inversedBy: "cars")]
     private ?Model $model = null;
 
+    /**
+     * @var Collection
+     */
     #[ORM\OneToMany(mappedBy: "car", targetEntity: Order::class)]
     private Collection $car;
 

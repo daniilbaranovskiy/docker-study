@@ -10,15 +10,27 @@ use JsonSerializable;
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
 class Model implements JsonSerializable
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $name = null;
+    /**
+     * @var Brand|null
+     */
     #[ORM\ManyToOne(targetEntity: Brand::class, inversedBy: "models")]
     private ?Brand $brand = null;
+    /**
+     * @var Collection
+     */
     #[ORM\OneToMany(mappedBy: "model", targetEntity: Car::class)]
     private Collection $cars;
 
