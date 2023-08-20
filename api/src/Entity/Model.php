@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ModelRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
@@ -22,12 +23,20 @@ class Model implements JsonSerializable
      * @var string|null
      */
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $brand = null;
+
     /**
-     * @var Brand|null
+     * @var string|null
      */
-    #[ORM\ManyToOne(targetEntity: Brand::class, inversedBy: "models")]
-    private ?Brand $brand = null;
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(length: 255)]
+    private ?string $country = null;
+
     /**
      * @var Collection
      */
@@ -35,11 +44,38 @@ class Model implements JsonSerializable
     private Collection $cars;
 
     /**
+     * Model constructor
+     */
+    public function __construct()
+    {
+        $this->cars = new ArrayCollection();
+    }
+
+    /**
      * @return int|null
      */
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBrand(): ?string
+    {
+        return $this->brand;
+    }
+
+    /**
+     * @param string $brand
+     * @return $this
+     */
+    public function setBrand(string $brand): static
+    {
+        $this->brand = $brand;
+
+        return $this;
     }
 
     /**
@@ -62,20 +98,22 @@ class Model implements JsonSerializable
     }
 
     /**
-     * @return Brand|null
+     * @return string|null
      */
-    public function getBrand(): ?Brand
+    public function getCountry(): ?string
     {
-        return $this->brand;
+        return $this->country;
     }
 
     /**
-     * @param Brand|null $brand
-     * @return void
+     * @param string $country
+     * @return $this
      */
-    public function setBrand(?Brand $brand): void
+    public function setCountry(string $country): static
     {
-        $this->brand = $brand;
+        $this->country = $country;
+
+        return $this;
     }
 
     /**
@@ -88,11 +126,13 @@ class Model implements JsonSerializable
 
     /**
      * @param Collection $cars
-     * @return void
+     * @return $this
      */
-    public function setCars(Collection $cars): void
+    public function setCars(Collection $cars): static
     {
         $this->cars = $cars;
+
+        return $this;
     }
 
     /**
@@ -101,9 +141,10 @@ class Model implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            "id" => $this->getId(),
-            "name" => $this->getName(),
-            "brand" => $this->getBrand(),
+            'id' => $this->getId(),
+            'brand' => $this->getBrand(),
+            'name' => $this->getName(),
+            'country' => $this->getCountry(),
         ];
     }
 

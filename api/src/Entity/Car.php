@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\CarRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
@@ -20,17 +19,20 @@ class Car implements JsonSerializable
     private ?int $id = null;
 
     /**
-     * @var string|null
+     * @var int|null
      */
-    #[ORM\Column(length: 255)]
-    private ?string $year = null;
+    #[ORM\Column]
+    private ?int $year = null;
 
     /**
      * @var string|null
      */
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: '0')]
     private ?string $price = null;
 
+    /**
+     * @var int|null
+     */
     #[ORM\Column]
     private ?int $quantity = null;
 
@@ -53,16 +55,16 @@ class Car implements JsonSerializable
     private ?string $color = null;
 
     /**
+     * @var int|null
+     */
+    #[ORM\Column]
+    private ?int $horsepower = null;
+
+    /**
      * @var Model|null
      */
     #[ORM\ManyToOne(targetEntity: Model::class, inversedBy: "cars")]
     private ?Model $model = null;
-
-    /**
-     * @var Collection
-     */
-    #[ORM\OneToMany(mappedBy: "car", targetEntity: Order::class)]
-    private Collection $car;
 
     /**
      * @return int|null
@@ -73,18 +75,18 @@ class Car implements JsonSerializable
     }
 
     /**
-     * @return string|null
+     * @return int|null
      */
-    public function getYear(): ?string
+    public function getYear(): ?int
     {
         return $this->year;
     }
 
     /**
-     * @param string $year
+     * @param int $year
      * @return $this
      */
-    public function setYear(string $year): static
+    public function setYear(int $year): static
     {
         $this->year = $year;
 
@@ -187,6 +189,25 @@ class Car implements JsonSerializable
     }
 
     /**
+     * @return int|null
+     */
+    public function getHorsepower(): ?int
+    {
+        return $this->horsepower;
+    }
+
+    /**
+     * @param int $horsepower
+     * @return $this
+     */
+    public function setHorsepower(int $horsepower): static
+    {
+        $this->horsepower = $horsepower;
+
+        return $this;
+    }
+
+    /**
      * @return Model|null
      */
     public function getModel(): ?Model
@@ -196,28 +217,13 @@ class Car implements JsonSerializable
 
     /**
      * @param Model|null $model
-     * @return void
+     * @return $this
      */
-    public function setModel(?Model $model): void
+    public function setModel(?Model $model): static
     {
         $this->model = $model;
-    }
 
-    /**
-     * @return Collection
-     */
-    public function getCar(): Collection
-    {
-        return $this->car;
-    }
-
-    /**
-     * @param Collection $car
-     * @return void
-     */
-    public function setCar(Collection $car): void
-    {
-        $this->car = $car;
+        return $this;
     }
 
     /**
@@ -233,7 +239,8 @@ class Car implements JsonSerializable
             'quantity' => $this->getQuantity(),
             'fuel_type' => $this->getFuelType(),
             'transmission' => $this->getTransmission(),
-            'color' => $this->getColor()
+            'color' => $this->getColor(),
+            'horsepower' => $this->getHorsepower()
         ];
     }
 }

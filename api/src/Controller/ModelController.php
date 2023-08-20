@@ -33,46 +33,35 @@ class ModelController extends AbstractController
      * @throws Exception
      */
     #[Route('model-add', name: 'model_add')]
-    public function add(Request $request): JsonResponse
+    public function addModel(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
         if (!isset(
+            $requestData['brand'],
             $requestData['name'],
-            $requestData['brand']
+            $requestData['country'],
         )) {
             throw new Exception("Invalid request data");
         }
-        $brand = $this->entityManager->getRepository(Model::class)->find($requestData["model"]);
-        if (!$brand) {
-            throw new Exception("Brand with id " . $requestData['brand'] . " not found");
-        }
         $model = new Model();
         $model
-            ->setName($requestData['year'])
-            ->setBrand($brand);
+            ->setBrand($requestData['brand'])
+            ->setName($requestData['name'])
+            ->setCountry($requestData['country']);
         $this->entityManager->persist($model);
         $this->entityManager->flush();
+
         return new JsonResponse($model, Response::HTTP_CREATED);
     }
 
     /**
      * @return JsonResponse
      */
-
     #[Route('model-all', name: 'model_all')]
     public function getAll(): JsonResponse
     {
         $model = $this->entityManager->getRepository(Model::class)->findAll();
-        return new JsonResponse($model);
-    }
 
-    /**
-     * @return JsonResponse
-     */
-    #[Route('model-name', name: 'model_name')]
-    public function getModelByName(): JsonResponse
-    {
-        $model = $this->entityManager->getRepository(Model::class)->getAllModelsByName("A4");
         return new JsonResponse($model);
     }
 
@@ -81,14 +70,15 @@ class ModelController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('model/{id}', name: 'model_get_item')]
-    public function getItem(string $id): JsonResponse
+    #[Route('model/{id}', name: 'get_model')]
+    public function getModel(string $id): JsonResponse
     {
         /** @var Model $model */
         $model = $this->entityManager->getRepository(Model::class)->find($id);
         if (!$model) {
             throw new Exception("Model with id " . $id . " not found");
         }
+
         return new JsonResponse($model);
     }
 
@@ -97,7 +87,7 @@ class ModelController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('model-update/{id}', name: 'model_update_item')]
+    #[Route('model-update/{id}', name: 'model_update')]
     public function updateModel(string $id): JsonResponse
     {
         /** @var Model $model */
@@ -107,6 +97,7 @@ class ModelController extends AbstractController
         }
         $model->setName("New name");
         $this->entityManager->flush();
+
         return new JsonResponse($model);
     }
 
@@ -115,7 +106,7 @@ class ModelController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('model-delete/{id}', name: 'model_delete_item')]
+    #[Route('model-delete/{id}', name: 'model_delete')]
     public function deleteModel(string $id): JsonResponse
     {
         /** @var Model $model */
@@ -125,6 +116,7 @@ class ModelController extends AbstractController
         }
         $this->entityManager->remove($model);
         $this->entityManager->flush();
+
         return new JsonResponse();
     }
 
