@@ -86,7 +86,7 @@ class Car implements JsonSerializable
      * @param int $year
      * @return $this
      */
-    public function setYear(int $year): static
+    public function setYear(int $year): self
     {
         $this->year = $year;
 
@@ -105,7 +105,7 @@ class Car implements JsonSerializable
      * @param string $price
      * @return $this
      */
-    public function setPrice(string $price): static
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
@@ -124,7 +124,7 @@ class Car implements JsonSerializable
      * @param int $quantity
      * @return $this
      */
-    public function setQuantity(int $quantity): static
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
 
@@ -143,7 +143,7 @@ class Car implements JsonSerializable
      * @param string $fuel_type
      * @return $this
      */
-    public function setFuelType(string $fuel_type): static
+    public function setFuelType(string $fuel_type): self
     {
         $this->fuel_type = $fuel_type;
 
@@ -162,7 +162,7 @@ class Car implements JsonSerializable
      * @param string $transmission
      * @return $this
      */
-    public function setTransmission(string $transmission): static
+    public function setTransmission(string $transmission): self
     {
         $this->transmission = $transmission;
 
@@ -181,7 +181,7 @@ class Car implements JsonSerializable
      * @param string $color
      * @return $this
      */
-    public function setColor(string $color): static
+    public function setColor(string $color): self
     {
         $this->color = $color;
 
@@ -200,7 +200,7 @@ class Car implements JsonSerializable
      * @param int $horsepower
      * @return $this
      */
-    public function setHorsepower(int $horsepower): static
+    public function setHorsepower(int $horsepower): self
     {
         $this->horsepower = $horsepower;
 
@@ -219,7 +219,7 @@ class Car implements JsonSerializable
      * @param Model|null $model
      * @return $this
      */
-    public function setModel(?Model $model): static
+    public function setModel(?Model $model): self
     {
         $this->model = $model;
 

@@ -71,7 +71,7 @@ class Model implements JsonSerializable
      * @param string $brand
      * @return $this
      */
-    public function setBrand(string $brand): static
+    public function setBrand(string $brand): self
     {
         $this->brand = $brand;
 
@@ -90,7 +90,7 @@ class Model implements JsonSerializable
      * @param string $name
      * @return $this
      */
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -109,7 +109,7 @@ class Model implements JsonSerializable
      * @param string $country
      * @return $this
      */
-    public function setCountry(string $country): static
+    public function setCountry(string $country): self
     {
         $this->country = $country;
 
@@ -128,7 +128,7 @@ class Model implements JsonSerializable
      * @param Collection $cars
      * @return $this
      */
-    public function setCars(Collection $cars): static
+    public function setCars(Collection $cars): self
     {
         $this->cars = $cars;
 
