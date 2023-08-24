@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Model;
+use App\Entity\User;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ModelController extends AbstractController
 {
@@ -36,6 +38,7 @@ class ModelController extends AbstractController
     #[Route('model-add', name: 'model_add')]
     public function addModel(Request $request): JsonResponse
     {
+        $this->checkAdminAuthorization();
         $requestData = json_decode($request->getContent(), true);
         if (!isset(
             $requestData['brand'],
@@ -69,6 +72,7 @@ class ModelController extends AbstractController
     #[Route('model-all', name: 'model_all')]
     public function getAll(): JsonResponse
     {
+        $this->checkAdminAuthorization();
         $model = $this->entityManager->getRepository(Model::class)->findAll();
 
         return new JsonResponse($model);
@@ -82,6 +86,7 @@ class ModelController extends AbstractController
     #[Route('model/{id}', name: 'get_model')]
     public function getModel(string $id): JsonResponse
     {
+        $this->checkAdminAuthorization();
         /** @var Model $model */
         $model = $this->entityManager->getRepository(Model::class)->find($id);
         if (!$model) {
@@ -99,6 +104,7 @@ class ModelController extends AbstractController
     #[Route('model-update/{id}', name: 'model_update')]
     public function updateModel(string $id): JsonResponse
     {
+        $this->checkAdminAuthorization();
         /** @var Model $model */
         $model = $this->entityManager->getRepository(Model::class)->find($id);
         if (!$model) {
@@ -119,6 +125,7 @@ class ModelController extends AbstractController
     #[Route('model-delete/{id}', name: 'model_delete')]
     public function deleteModel(string $id): JsonResponse
     {
+        $this->checkAdminAuthorization();
         /** @var Model $model */
         $model = $this->entityManager->getRepository(Model::class)->find($id);
         if (!$model) {
@@ -128,6 +135,17 @@ class ModelController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse();
+    }
+
+    /**
+     * @return void
+     */
+    public function checkAdminAuthorization(): void
+    {
+        $user = $this->getUser();
+        if (!$user || !in_array(User::ROLE_ADMIN, $user->getRoles())) {
+            throw new AccessDeniedException('Unauthorized');
+        }
     }
 
 }

@@ -23,5 +23,8 @@ security:
       stateless: true
       jwt: ~
   access_control:
-    - { path: ^/api/login, roles: PUBLIC_ACCESS }
-    - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/api/login,    roles: PUBLIC_ACCESS }
+    - { path: ^/api/user-add, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/car-all,  roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/cars,     roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api,          roles: IS_AUTHENTICATED_FULLY }

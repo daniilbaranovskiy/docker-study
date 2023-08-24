@@ -43,6 +43,11 @@ class UserController extends AbstractController
     #[Route('user-add', name: 'user_add')]
     public function addUser(Request $request): JsonResponse
     {
+        $user = $this->getUser();
+        if ($user) {
+            return new JsonResponse(['message' => 'You are already authorized']);
+        }
+
         $requestData = json_decode($request->getContent(), true);
         if (!isset(
             $requestData['email'],
@@ -50,18 +55,19 @@ class UserController extends AbstractController
         )) {
             throw new Exception("Invalid request data");
         }
-        $user = new User();
+
+        $newUser = new User();
         $hashedPassword = $this->passwordHasher->hashPassword(
-            $user,
+            $newUser,
             $requestData['password']
         );
-        $user
+        $newUser
             ->setEmail($requestData['email'])
             ->setPassword($hashedPassword);
-        $this->entityManager->persist($user);
+        $this->entityManager->persist($newUser);
         $this->entityManager->flush();
 
-        return new JsonResponse($user, Response::HTTP_CREATED);
+        return new JsonResponse($newUser, Response::HTTP_CREATED);
     }
 
     /**
@@ -70,6 +76,11 @@ class UserController extends AbstractController
     #[Route('user-all', name: 'user_all')]
     public function getAll(): JsonResponse
     {
+        $user = $this->getUser();
+        if (!$user || !in_array(User::ROLE_ADMIN, $user->getRoles())) {
+            return new JsonResponse(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
         $model = $this->entityManager->getRepository(User::class)->findAll();
 
         return new JsonResponse($model);
@@ -83,6 +94,11 @@ class UserController extends AbstractController
     #[Route('user/{id}', name: 'get_user')]
     public function getUserById(string $id): JsonResponse
     {
+        $user = $this->getUser();
+        if (!$user || !in_array(User::ROLE_ADMIN, $user->getRoles())) {
+            return new JsonResponse(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
         if (!$user) {
@@ -100,16 +116,21 @@ class UserController extends AbstractController
     #[Route('user-update/{id}', name: 'user_update')]
     public function updateUser(string $id): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
         if (!$user) {
             throw new Exception("User with id " . $id . " not found");
         }
 
-        $user->setEmail("new@gmail.com");
-        $this->entityManager->flush();
-
-        return new JsonResponse($user);
+        if ($currentUser && $currentUser->getId() === $user->getId()) {
+            $user->setEmail("admin@gmail.com");
+            $this->entityManager->flush();
+            return new JsonResponse($user);
+        } else {
+            return new JsonResponse(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
     }
 
     /**
@@ -120,15 +141,19 @@ class UserController extends AbstractController
     #[Route('user-delete/{id}', name: 'user_delete')]
     public function deleteUser(string $id): JsonResponse
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
         if (!$user) {
             throw new Exception("User with id " . $id . " not found");
         }
-
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
-
-        return new JsonResponse();
+        if ($currentUser && $currentUser->getId() === $user->getId()) {
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+            return new JsonResponse();
+        } else {
+            return new JsonResponse(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
     }
 }

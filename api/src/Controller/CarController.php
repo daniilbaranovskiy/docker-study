@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Car;
 use App\Entity\Model;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class CarController extends AbstractController
 {
@@ -36,6 +38,7 @@ class CarController extends AbstractController
     #[Route('car-add', name: 'car_add')]
     public function addCar(Request $request): JsonResponse
     {
+        $this->checkAdminAuthorization();
         $requestData = json_decode($request->getContent(), true);
         if (!isset(
             $requestData['model'],
@@ -120,6 +123,7 @@ class CarController extends AbstractController
     #[Route('car/{id}', name: 'get_car')]
     public function getCar(string $id): JsonResponse
     {
+        $this->checkAdminAuthorization();
         /** @var Car $car */
         $car = $this->entityManager->getRepository(Car::class)->find($id);
         if (!$car) {
@@ -137,6 +141,7 @@ class CarController extends AbstractController
     #[Route('car-update/{id}', name: 'car_update_item')]
     public function updateCar(string $id): JsonResponse
     {
+        $this->checkAdminAuthorization();
         /** @var Car $car */
         $car = $this->entityManager->getRepository(Car::class)->find($id);
         if (!$car) {
@@ -157,6 +162,7 @@ class CarController extends AbstractController
     #[Route('car-delete/{id}', name: 'car_delete_item')]
     public function deleteCar(string $id): JsonResponse
     {
+        $this->checkAdminAuthorization();
         /** @var Car $car */
         $car = $this->entityManager->getRepository(Car::class)->find($id);
         if (!$car) {
@@ -167,6 +173,17 @@ class CarController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse();
+    }
+
+    /**
+     * @return void
+     */
+    public function checkAdminAuthorization(): void
+    {
+        $user = $this->getUser();
+        if (!$user || !in_array(User::ROLE_ADMIN, $user->getRoles())) {
+            throw new AccessDeniedException('Unauthorized');
+        }
     }
 
 }

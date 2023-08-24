@@ -72,7 +72,7 @@ class CarRepository extends ServiceEntityRepository
             ->andWhere('model.brand LIKE :brandName')
             ->andWhere('model.name LIKE :modelName')
             ->andWhere('model.country LIKE :country')
-            ->andWhere('car.fuel_type LIKE :fuelType')
+            ->andWhere('car.fuelType LIKE :fuelType')
             ->andWhere('car.transmission LIKE :transmission')
             ->andWhere('car.color LIKE :color');
 
