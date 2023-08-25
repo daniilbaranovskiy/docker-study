@@ -94,18 +94,20 @@ class UserController extends AbstractController
     #[Route('user/{id}', name: 'get_user')]
     public function getUserById(string $id): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user || !in_array(User::ROLE_ADMIN, $user->getRoles())) {
-            return new JsonResponse(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
-        }
-
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
         if (!$user) {
             throw new Exception("User with id " . $id . " not found");
         }
+        if ($currentUser && $currentUser->getId() === $user->getId()) {
 
-        return new JsonResponse($user);
+            return new JsonResponse($user);
+        } else {
+
+            return new JsonResponse(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
     }
 
     /**

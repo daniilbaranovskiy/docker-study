@@ -43,17 +43,17 @@ class OrdersController extends AbstractController
         $requestData = json_decode($request->getContent(), true);
         if (!isset(
             $requestData['car_ids'],
-            $requestData['user_id']
         )) {
             throw new Exception("Invalid request data");
         }
 
-        $user = $this->entityManager->getRepository(User::class)->find($requestData["user_id"]);
+        $currentUser = $this->getUser();
+        /** @var User $currentUser */
+        $user = $this->entityManager->getRepository(User::class)->find($currentUser->getId());
         if (!$user) {
             throw new Exception("User with id " . $requestData['user_id'] . " not found");
         }
 
-        $currentUser = $this->getUser();
         if ($currentUser !== $user || !in_array(User::ROLE_USER, $currentUser->getRoles())) {
             throw new AccessDeniedException('Unauthorized');
         }
@@ -70,6 +70,7 @@ class OrdersController extends AbstractController
             if (!$car) {
                 throw new Exception("Car with id " . $carId . " not found");
             }
+
             $order->addCar($car);
             $totalOrderSum += $car->getPrice();
         }
@@ -86,10 +87,16 @@ class OrdersController extends AbstractController
     #[Route('order-all', name: 'order_all')]
     public function getAll(): JsonResponse
     {
-        $this->checkAdminAuthorization();
-        $order = $this->entityManager->getRepository(Orders::class)->findAll();
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $orderRepository = $this->entityManager->getRepository(Orders::class);
+        $orders = $orderRepository->findBy(['user' => $currentUser]);
+        $user = $this->entityManager->getRepository(User::class)->find($currentUser->getId());
+        if ($currentUser !== $user || !in_array(User::ROLE_USER, $currentUser->getRoles())) {
+            throw new AccessDeniedException('Unauthorized');
+        }
 
-        return new JsonResponse($order);
+        return new JsonResponse($orders);
     }
 
     /**
@@ -133,7 +140,7 @@ class OrdersController extends AbstractController
             throw new AccessDeniedException('Unauthorized');
         }
 
-        $order->setOrderSum(21000);
+        $order->setOrderSum(25000);
         $this->entityManager->flush();
 
         return new JsonResponse($order);
@@ -174,6 +181,4 @@ class OrdersController extends AbstractController
             throw new AccessDeniedException('Unauthorized');
         }
     }
-
-
 }
