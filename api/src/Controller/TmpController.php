@@ -4,15 +4,15 @@ namespace App\Controller;
 
 
 use App\Entity\Product;
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class TmpController extends AbstractController
@@ -23,27 +23,47 @@ class TmpController extends AbstractController
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param EntityManagerInterface $entityManager
+     * @var DenormalizerInterface
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    private DenormalizerInterface $denormalizer;
+
+    /**
+     * @var ValidatorInterface
+     */
+    private ValidatorInterface $validator;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param DenormalizerInterface $denormalizer
+     * @param ValidatorInterface $validator
+     */
+    public function __construct(EntityManagerInterface $entityManager, DenormalizerInterface $denormalizer, ValidatorInterface $validator)
     {
         $this->entityManager = $entityManager;
+        $this->denormalizer = $denormalizer;
+        $this->validator = $validator;
     }
 
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
      */
     #[Route(path: "tmp", name: "app_tmp")]
-    public function tmp(): JsonResponse
+    public function tmp(Request $request): JsonResponse
     {
-        $user = $this->getUser();
-        $products = $this->entityManager->getRepository(Product::class)->findAll();
-        if (in_array(User::ROLE_ADMIN, $user->getRoles())) {
-            return new JsonResponse($products);
+        //$user = $this->getUser();
+        $requestData = json_decode($request->getContent(), true);
+        $products = $this->denormalizer->denormalize($requestData, Product::class, "array");
+//        $products = $this->entityManager->getRepository(Product::class)->findAll();
+//        if (in_array(User::ROLE_ADMIN, $user->getRoles())) {
+//            return new JsonResponse($products);
+//        }
+        $errors = $this->validator->validate($products);
+        if (count($errors) > 0) {
+            return new JsonResponse((string)$errors);
+
         }
-        return new JsonResponse($this->fetchProductsForUser($products));
+        return new JsonResponse();
 
     }
 
