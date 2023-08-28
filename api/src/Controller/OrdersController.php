@@ -64,7 +64,6 @@ class OrdersController extends AbstractController
     public function add(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
-
         $currentUser = $this->getUser();
         /** @var User $currentUser */
         $user = $this->entityManager->getRepository(User::class)->find($currentUser->getId());
@@ -77,7 +76,6 @@ class OrdersController extends AbstractController
         }
 
         $order = $this->denormalizer->denormalize($requestData, Orders::class, "array");
-
         $totalOrderSum = 0;
         $productRepository = $this->entityManager->getRepository(Product::class);
         $products = $productRepository->findBy(['id' => $requestData['product_ids']]);
@@ -97,6 +95,7 @@ class OrdersController extends AbstractController
         if (count($errors) > 0) {
             return new JsonResponse((string)$errors);
         }
+
         $order
             ->setStatus($requestData['status']);
         $this->entityManager->persist($order);
@@ -104,7 +103,6 @@ class OrdersController extends AbstractController
 
         return new JsonResponse($order, Response::HTTP_CREATED);
     }
-
 
     /**
      * @return JsonResponse
@@ -193,6 +191,7 @@ class OrdersController extends AbstractController
         if (count($errors) > 0) {
             return new JsonResponse((string)$errors);
         }
+
         $this->entityManager->flush();
 
         return new JsonResponse($order);

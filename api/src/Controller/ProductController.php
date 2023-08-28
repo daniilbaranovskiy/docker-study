@@ -73,6 +73,7 @@ class ProductController extends AbstractController
         if (count($errors) > 0) {
             return new JsonResponse((string)$errors);
         }
+
         $product
             ->setName($requestData['name'])
             ->setPrice($requestData['price'])
@@ -106,7 +107,6 @@ class ProductController extends AbstractController
     public function show(string $id): JsonResponse
     {
         $product = $this->entityManager->getRepository(Product::class)->find($id);
-
         if (!$product) {
             throw new NotFoundHttpException("Product with id " . $id . " not found");
         }
@@ -146,6 +146,7 @@ class ProductController extends AbstractController
         if (count($errors) > 0) {
             return new JsonResponse((string)$errors);
         }
+
         $this->entityManager->flush();
 
         return new JsonResponse($product);
@@ -165,6 +166,7 @@ class ProductController extends AbstractController
         if (!$product) {
             throw new NotFoundHttpException("Product with id " . $id . " not found");
         }
+
         $this->entityManager->remove($product);
         $this->entityManager->flush();
 

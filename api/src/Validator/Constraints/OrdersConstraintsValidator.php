@@ -10,8 +10,14 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class OrdersConstraintsValidator extends ConstraintValidator
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -48,6 +54,7 @@ class OrdersConstraintsValidator extends ConstraintValidator
             $this->context->addViolation("Order sum cannot exceed 1000.");
 
         }
+
         $user = $value->getUser();
         if ($user) {
             $userOrders = $this->entityManager->getRepository(Orders::class)->findBy(['user' => $user]);
@@ -56,5 +63,4 @@ class OrdersConstraintsValidator extends ConstraintValidator
             }
         }
     }
-
 }

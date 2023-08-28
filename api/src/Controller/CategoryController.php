@@ -53,7 +53,6 @@ class CategoryController extends AbstractController
         $this->validator = $validator;
     }
 
-
     /**
      * @param Request $request
      * @return JsonResponse
@@ -154,6 +153,7 @@ class CategoryController extends AbstractController
         if (!$category) {
             throw new NotFoundHttpException("Category with id " . $id . " not found");
         }
+
         $this->entityManager->remove($category);
         $this->entityManager->flush();
 
