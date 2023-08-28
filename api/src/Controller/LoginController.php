@@ -30,11 +30,13 @@ class LoginController extends AbstractController
     public function index(): JsonResponse
     {
         $user = $this->security->getUser();
+
         if (!$user) {
             return $this->json([
                 'message' => 'missing credentials',
             ], Response::HTTP_UNAUTHORIZED);
         }
+
         return $this->json([
             'user' => $user->getUserIdentifier(),
         ]);

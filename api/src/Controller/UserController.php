@@ -69,25 +69,32 @@ class UserController extends AbstractController
     public function add(Request $request): JsonResponse
     {
         $user = $this->getUser();
+
         if ($user) {
             return new JsonResponse(['message' => 'You are already authorized']);
         }
 
         $requestData = json_decode($request->getContent(), true);
+
         $newUser = $this->denormalizer->denormalize($requestData, User::class, "array");
+
         $hashedPassword = $this->passwordHasher->hashPassword(
             $newUser,
             $requestData['password']
         );
+
         $newUser
             ->setEmail($requestData['email'])
             ->setPassword($hashedPassword);
+
         $errors = $this->validator->validate($newUser);
+
         if (count($errors) > 0) {
             return new JsonResponse((string)$errors);
         }
 
         $this->entityManager->persist($newUser);
+
         $this->entityManager->flush();
 
         return new JsonResponse($newUser, Response::HTTP_CREATED);
@@ -100,6 +107,7 @@ class UserController extends AbstractController
     public function list(): JsonResponse
     {
         $this->checkAdminAuthorization();
+
         $users = $this->entityManager->getRepository(User::class)->findAll();
 
         return new JsonResponse($users);
@@ -115,8 +123,11 @@ class UserController extends AbstractController
     {
         /** @var User $currentUser */
         $currentUser = $this->getUser();
+
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
+
+
         if (!$user) {
             throw new NotFoundHttpException("User with id " . $id . " not found");
         }
@@ -138,16 +149,21 @@ class UserController extends AbstractController
     {
         /** @var User $currentUser */
         $currentUser = $this->getUser();
+
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
+
         if (!$user) {
             throw new NotFoundHttpException("User with id " . $id . " not found");
         }
 
         $requestData = json_decode($request->getContent(), true);
+
         if ($currentUser && $currentUser->getId() === $user->getId()) {
             $user->setEmail($requestData['email']);
+
             $errors = $this->validator->validate($user);
+
             if (count($errors) > 0) {
                 return new JsonResponse((string)$errors);
             }
@@ -170,14 +186,17 @@ class UserController extends AbstractController
     {
         /** @var User $currentUser */
         $currentUser = $this->getUser();
+
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
+
         if (!$user) {
             throw new NotFoundHttpException("User with id " . $id . " not found");
         }
 
         if ($currentUser && $currentUser->getId() === $user->getId()) {
             $this->entityManager->remove($user);
+
             $this->entityManager->flush();
 
             return new JsonResponse(status: Response::HTTP_NON_AUTHORITATIVE_INFORMATION);
@@ -192,6 +211,7 @@ class UserController extends AbstractController
     public function checkAdminAuthorization(): void
     {
         $user = $this->getUser();
+
         if (!$user || !in_array(User::ROLE_ADMIN, $user->getRoles())) {
             throw new AccessDeniedHttpException("Access denied");
         }
