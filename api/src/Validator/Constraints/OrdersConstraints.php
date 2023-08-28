@@ -7,9 +7,9 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
-#[\Attribute] class ProductConstraints extends Constraint
+#[\Attribute]
+class OrdersConstraints extends Constraint
 {
-
     /**
      * @return string
      */
@@ -25,5 +25,4 @@ use Symfony\Component\Validator\Constraint;
     {
         return self::CLASS_CONSTRAINT;
     }
-
 }

@@ -10,6 +10,7 @@ security:
       entity:
         class: App\Entity\User
         property: email
+    # used to reload user from session & other features (e.g. switch_user)
   firewalls:
     login:
       pattern: ^/api/login
@@ -23,5 +24,8 @@ security:
       stateless: true
       jwt: ~
   access_control:
-    - { path: ^/api/login, roles: PUBLIC_ACCESS }
-    - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/api/login,    roles: PUBLIC_ACCESS }
+    - { path: ^/api/user, roles: PUBLIC_ACCESS }
+    - { path: ^/api/category, roles: PUBLIC_ACCESS }
+    - { path: ^/api/product,  roles: PUBLIC_ACCESS }
+    - { path: ^/api,          roles: IS_AUTHENTICATED_FULLY }

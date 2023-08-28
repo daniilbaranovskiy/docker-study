@@ -4,15 +4,17 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSerializable
 {
+
     public const ROLE_USER = "ROLE_USER";
     public const ROLE_ADMIN = "ROLE_ADMIN";
-
 
     /**
      * @var int|null
@@ -26,25 +28,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string|null
      */
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank(message: "Email cannot be blank")]
+    #[Assert\Email(message: "Invalid email format")]
     private ?string $email = null;
 
     /**
-     * @var array
+     * @var string[]
      */
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Roles cannot be blank")]
     private array $roles = [];
 
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Password cannot be blank")]
+    private ?string $password = null;
+
+    /**
+     * User constructor
+     */
     public function __construct()
     {
         $this->roles = [self::ROLE_USER];
     }
 
     /**
-     * @var string The hashed password
+     * @return int|null
      */
-    #[ORM\Column]
-    private ?string $password = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -62,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param string $email
      * @return $this
      */
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
 
@@ -71,7 +83,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
     public function getUserIdentifier(): string
@@ -99,7 +110,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param array $roles
      * @return $this
      */
-    public function setRoles(array $roles): static
+    public function setRoles(array $roles): self
     {
         $this->roles = $roles;
 
@@ -118,7 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param string $password
      * @return $this
      */
-    public function setPassword(string $password): static
+    public function setPassword(string $password): self
     {
         $this->password = $password;
 
@@ -143,5 +154,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'email' => $this->getEmail(),
+        ];
     }
 }

@@ -3,25 +3,62 @@
 namespace App\Entity;
 
 use App\Repository\CategoryRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
+#[UniqueEntity(fields: ['name'], message: 'This name is already taken.')]
 class Category implements JsonSerializable
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Name cannot be blank.")]
+    #[Assert\Length(max: 255, maxMessage: "Name cannot be longer than {{ limit }} characters.")]
+    #[Assert\Regex(pattern: '/^[a-zA-Z0-9\s]+$/', message: "Name can only contain letters, digits, and spaces.")]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(length: 500)]
+    #[Assert\NotBlank(message: "Description cannot be blank.")]
+    #[Assert\Length(max: 500, maxMessage: "Description cannot be longer than {{ limit }} characters.")]
+    #[Assert\Regex(pattern: '/^[a-zA-Z0-9\s]+$/', message: "Description can only contain letters, digits, and spaces.")]
+    private ?string $description = null;
 
+    /**
+     * @var DateTimeInterface|null
+     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: "CreatedAt cannot be blank")]
+    private ?DateTimeInterface $createdAt = null;
+
+    /**
+     * @var DateTimeInterface|null
+     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: "UpdatedAt cannot be blank")]
+    private ?DateTimeInterface $updatedAt = null;
+
+    /**
+     * @var Collection
+     */
     #[ORM\OneToMany(mappedBy: "category", targetEntity: Product::class)]
     private Collection $products;
 
@@ -53,7 +90,7 @@ class Category implements JsonSerializable
      * @param string $name
      * @return $this
      */
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -63,36 +100,77 @@ class Category implements JsonSerializable
     /**
      * @return string|null
      */
-    public function getType(): ?string
+    public function getDescription(): ?string
     {
-        return $this->type;
+        return $this->description;
     }
 
     /**
-     * @param string $type
+     * @param string $description
      * @return $this
      */
-    public function setType(string $type): static
+    public function setDescription(string $description): self
     {
-        $this->type = $type;
+        $this->description = $description;
 
         return $this;
     }
 
     /**
-     * @return ArrayCollection|Collection
+     * @return DateTimeInterface|null
      */
-    public function getProducts(): ArrayCollection|Collection
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTimeInterface $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return DateTimeInterface|null
+     */
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param DateTimeInterface $updatedAt
+     * @return $this
+     */
+    public function setUpdatedAt(DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getProducts(): Collection
     {
         return $this->products;
     }
 
     /**
-     * @param ArrayCollection|Collection $products
+     * @param Collection $products
+     * @return $this
      */
-    public function setProducts(ArrayCollection|Collection $products): void
+    public function setProducts(Collection $products): self
     {
         $this->products = $products;
+
+        return $this;
     }
 
     /**
@@ -101,9 +179,11 @@ class Category implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            "id"   => $this->getId(),
+            "id" => $this->getId(),
             "name" => $this->getName(),
-            "type" => $this->getType()
+            "description" => $this->getDescription(),
+            "createdAt" => $this->getCreatedAt()->format('Y-m-d H:i:s'),
+            "updatedAt" => $this->getUpdatedAt()->format('Y-m-d H:i:s')
         ];
     }
 }
