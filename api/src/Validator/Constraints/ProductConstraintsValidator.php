@@ -20,11 +20,19 @@ class ProductConstraintsValidator extends ConstraintValidator
         if (!$constraint instanceof ProductConstraints){
             throw new UnexpectedTypeException($constraint, ProductConstraints::class);
         }
+
         if (!$value instanceof Product){
             throw new UnexpectedTypeException($constraint, Product::class);
         }
-        if (empty($value->getName())){
-            $this->context->addViolation("Name is empty");
+
+        $validMemory = ["64GB", "128GB", "256GB", "512GB", "1TB"];
+        if (!in_array($value->getMemory(), $validMemory)) {
+            $this->context->addViolation("Invalid memory.");
+        }
+
+        $validColor = ["black", "white", "gold", "red"];
+        if (!in_array($value->getColor(), $validMemory)) {
+            $this->context->addViolation("Invalid color.");
         }
     }
 }

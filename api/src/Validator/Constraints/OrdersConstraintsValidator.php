@@ -3,7 +3,6 @@
 namespace App\Validator\Constraints;
 
 use App\Entity\Orders;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -27,6 +26,16 @@ class OrdersConstraintsValidator extends ConstraintValidator
 
         if ($value->getOrderSum() > 1000) {
             $this->context->addViolation("Order sum cannot exceed 1000.");
+        }
+
+        $validStatuses = ["pending", "processing", "completed"];
+        if (!in_array($value->getStatus(), $validStatuses)) {
+            $this->context->addViolation("Invalid order status.");
+        }
+
+        $validPaymentMethod = ["cash", "card"];
+        if (!in_array($value->getPaymentMethod(), $validPaymentMethod)) {
+            $this->context->addViolation("Invalid payment method.");
         }
     }
 }

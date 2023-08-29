@@ -73,8 +73,14 @@ class Orders
      */
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Payment method cannot be blank")]
-    #[Assert\Choice(choices: ["card", "cash"], message: "Invalid memory payment method")]
     private ?string $paymentMethod = null;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Status sum cannot be blank")]
+    private ?string $status = null;
 
     /**
      * @var string|null
@@ -161,6 +167,25 @@ class Orders
     public function setPaymentMethod(string $paymentMethod): self
     {
         $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string|null $status
+     * @return $this
+     */
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

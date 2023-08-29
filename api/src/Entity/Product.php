@@ -4,12 +4,14 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProductRepository;
+use App\Validator\Constraints\ProductConstraints;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ProductConstraints]
 #[ApiResource(
     collectionOperations: [
         "get" => [
@@ -81,7 +83,6 @@ class Product
      */
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Memory cannot be blank")]
-    #[Assert\Choice(choices: ["64GB", "128GB", "256GB", "512GB", "1TB"], message: "Invalid memory size")]
     private ?string $memory = null;
 
     /**
