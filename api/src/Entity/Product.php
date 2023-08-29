@@ -6,48 +6,91 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[
-    ORM\Entity(repositoryClass: ProductRepository::class)]
-//#[ProductConstraints]
+
+#[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource(
     collectionOperations: [
         "get" => [
             "method" => "GET",
-        ]
+        ],
+        "post" => [
+            "method" => "POST",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')"
+        ],
     ],
     itemOperations: [
         "get" => [
             "method" => "GET"
-        ]
-    ], attributes: [
-    "security" => "is_granted('" . User::ROLE_ADMIN . "')"
-]
+        ],
+        "put" => [
+            "method" => "PUT",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')"
+        ],
+        "delete" => [
+            "method" => "DELETE",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')"
+        ],
+    ],
 )]
-class Product implements JsonSerializable
+class Product
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Name cannot be blank")]
+    #[Assert\Length(max: 255, maxMessage: "Name cannot be longer than {{ limit }} characters.")]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
-    private ?string $price = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(length: 500)]
+    #[Assert\NotBlank(message: "Description cannot be blank.")]
+    #[Assert\Length(max: 500, maxMessage: "Description cannot be longer than {{ limit }} characters.")]
     private ?string $description = null;
 
-//    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
-//    private ?Category $category = null;
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: '0')]
+    #[Assert\NotBlank(message: "Price cannot be blank")]
+    #[Assert\Positive(message: "Price must be a positive number")]
+    private ?string $price = null;
 
-//    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
-//    private ?ProductInfo $productInfo = null;
+    /**
+     * @var int|null
+     */
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Quantity cannot be blank")]
+    #[Assert\Positive(message: "Quantity must be a positive number")]
+    private ?int $quantity = null;
 
-//    #[ORM\ManyToMany(targetEntity: Test::class)]
-//    private Collection $test;
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Memory cannot be blank")]
+    #[Assert\Choice(choices: ["64GB", "128GB", "256GB", "512GB", "1TB"], message: "Invalid memory size")]
+    private ?string $memory = null;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Color cannot be blank")]
+    #[Assert\Length(max: 255, maxMessage: "Color is too long")]
+    private ?string $color = null;
 
     /**
      * @return int|null
@@ -69,9 +112,28 @@ class Product implements JsonSerializable
      * @param string $name
      * @return $this
      */
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return $this
+     */
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
 
         return $this;
     }
@@ -88,7 +150,7 @@ class Product implements JsonSerializable
      * @param string $price
      * @return $this
      */
-    public function setPrice(string $price): static
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
@@ -96,83 +158,59 @@ class Product implements JsonSerializable
     }
 
     /**
-     * @return string|null
+     * @return int|null
      */
-    public function getDescription(): ?string
+    public function getQuantity(): ?int
     {
-        return $this->description;
+        return $this->quantity;
     }
 
     /**
-     * @param string|null $description
+     * @param int $quantity
      * @return $this
      */
-    public function setDescription(?string $description): static
+    public function setQuantity(int $quantity): self
     {
-        $this->description = $description;
+        $this->quantity = $quantity;
 
         return $this;
     }
 
     /**
-     * @return array
+     * @return string|null
      */
-    public function jsonSerialize(): array
+    public function getMemory(): ?string
     {
-        return [
-            "id" => $this->getId(),
-            "name" => $this->getName(),
-            "price" => $this->getPrice(),
-            "description" => $this->getDescription(),
-        ];
+        return $this->memory;
     }
 
     /**
-     * @return Category|null
+     * @param string $memory
+     * @return $this
      */
-//    public function getCategory(): ?Category
-//    {
-//        return $this->category;
-//    }
-//
-//    /**
-//     * @param Category|null $category
-//     */
-//    public function setCategory(?Category $category): void
-//    {
-//        $this->category = $category;
-//    }
+    public function setMemory(string $memory): self
+    {
+        $this->memory = $memory;
 
-//    /**
-//     * @return ProductInfo|null
-//     */
-//    public function getProductInfo(): ?ProductInfo
-//    {
-//        return $this->productInfo;
-//    }
-//
-//    /**
-//     * @param ProductInfo|null $productInfo
-//     */
-//    public function setProductInfo(?ProductInfo $productInfo): void
-//    {
-//        $this->productInfo = $productInfo;
-//    }
+        return $this;
+    }
 
-//    /**
-//     * @return Collection
-//     */
-//    public function getTest(): Collection
-//    {
-//        return $this->test;
-//    }
-//
-//    /**
-//     * @param Collection $test
-//     */
-//    public function setTest(Collection $test): void
-//    {
-//        $this->test = $test;
-//    }
+    /**
+     * @return string|null
+     */
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
 
+    /**
+     * @param string $color
+     * @return $this
+     */
+    public function setColor(string $color): self
+    {
+        $this->color = $color;
+
+        return $this;
+    }
 }

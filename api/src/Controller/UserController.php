@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+class UserController extends AbstractController
+{
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @var UserPasswordHasherInterface
+     */
+    private UserPasswordHasherInterface $passwordHasher;
+
+    /**
+     * @var DenormalizerInterface
+     */
+    private DenormalizerInterface $denormalizer;
+
+    /**
+     * @var ValidatorInterface
+     */
+    private ValidatorInterface $validator;
+
+    /**
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param EntityManagerInterface $entityManager
+     * @param DenormalizerInterface $denormalizer
+     * @param ValidatorInterface $validator
+     */
+    public function __construct(
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface      $entityManager,
+        DenormalizerInterface       $denormalizer,
+        ValidatorInterface          $validator
+    )
+    {
+        $this->passwordHasher = $passwordHasher;
+        $this->entityManager = $entityManager;
+        $this->denormalizer = $denormalizer;
+        $this->validator = $validator;
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ExceptionInterface
+     * @throws Exception
+     */
+    #[Route('user', name: 'user_add', methods: ['POST'])]
+    public function add(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if ($user) {
+            return new JsonResponse(['message' => 'You are already authorized']);
+        }
+
+        $requestData = json_decode($request->getContent(), true);
+        $newUser = $this->denormalizer->denormalize($requestData, User::class, "array");
+
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $newUser,
+            $requestData['password']
+        );
+
+        $newUser
+            ->setEmail($requestData['email'])
+            ->setPassword($hashedPassword);
+
+        $errors = $this->validator->validate($newUser);
+        if (count($errors) > 0) {
+            return new JsonResponse((string)$errors);
+        }
+
+        $this->entityManager->persist($newUser);
+        $this->entityManager->flush();
+
+        return new JsonResponse($newUser, Response::HTTP_CREATED);
+    }
+}
