@@ -31,7 +31,7 @@ class ProductConstraintsValidator extends ConstraintValidator
         }
 
         $validColor = ["black", "white", "gold", "red"];
-        if (!in_array($value->getColor(), $validMemory)) {
+        if (!in_array($value->getColor(), $validColor)) {
             $this->context->addViolation("Invalid color.");
         }
     }
