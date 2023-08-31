@@ -7,16 +7,24 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-class Category implements JsonSerializable
+class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        "get:item:product"
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        "get:item:product",
+
+    ])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -89,21 +97,12 @@ class Category implements JsonSerializable
 
     /**
      * @param ArrayCollection|Collection $products
+     * @return Category
      */
-    public function setProducts(ArrayCollection|Collection $products): void
+    public function setProducts(ArrayCollection|Collection $products): self
     {
         $this->products = $products;
-    }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            "id"   => $this->getId(),
-            "name" => $this->getName(),
-            "type" => $this->getType()
-        ];
+        return $this;
     }
 }

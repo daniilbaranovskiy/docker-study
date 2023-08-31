@@ -2,46 +2,81 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use JsonSerializable;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[
-    ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\Entity(repositoryClass: ProductRepository::class)]
 //#[ProductConstraints]
 #[ApiResource(
     collectionOperations: [
         "get" => [
             "method" => "GET",
-        ]
+            "security" => "is_granted('" . User::ROLE_USER . "')",
+            "normalization_context" => ["groups" => "get:collection:product"]
+        ],
+        "post" => [
+            "method" => "POST",
+            "security" => "is_granted('" . User::ROLE_USER . "')",
+            "denormalization_context" => ["groups" => "post:collection:product"],
+            "normalization_context" => ["groups" => "get:collection:product"]
+        ],
     ],
     itemOperations: [
         "get" => [
-            "method" => "GET"
+            "method" => "GET",
+            "normalization_context" => ["groups" => "get:item:product"]
         ]
     ], attributes: [
-    "security" => "is_granted('" . User::ROLE_ADMIN . "')"
+    "security" => "is_granted('" . User::ROLE_ADMIN . "') or is_granted('" . User::ROLE_USER . "')"
 ]
 )]
-class Product implements JsonSerializable
+#[ApiFilter(SearchFilter::class, properties: ["name"=>"partial", "description"])]
+#[ApiFilter(RangeFilter::class, properties: ['price'])]
+class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        "get:item:product"
+    ])]
     private ?int $id = null;
     #[ORM\Column(length: 255)]
+    #[Groups([
+        "get:collection:product",
+        "get:item:product",
+        "post:collection:product"
+    ])]
     private ?string $name = null;
 
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+
+    ])]
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     private ?string $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+    ])]
     private ?string $description = null;
 
-//    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
-//    private ?Category $category = null;
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+
+    ])]
+    private ?Category $category = null;
 
 //    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
 //    private ?ProductInfo $productInfo = null;
@@ -115,64 +150,18 @@ class Product implements JsonSerializable
     }
 
     /**
-     * @return array
+     * @return Category|null
      */
-    public function jsonSerialize(): array
+    public function getCategory(): ?Category
     {
-        return [
-            "id" => $this->getId(),
-            "name" => $this->getName(),
-            "price" => $this->getPrice(),
-            "description" => $this->getDescription(),
-        ];
+        return $this->category;
     }
 
     /**
-     * @return Category|null
+     * @param Category|null $category
      */
-//    public function getCategory(): ?Category
-//    {
-//        return $this->category;
-//    }
-//
-//    /**
-//     * @param Category|null $category
-//     */
-//    public function setCategory(?Category $category): void
-//    {
-//        $this->category = $category;
-//    }
-
-//    /**
-//     * @return ProductInfo|null
-//     */
-//    public function getProductInfo(): ?ProductInfo
-//    {
-//        return $this->productInfo;
-//    }
-//
-//    /**
-//     * @param ProductInfo|null $productInfo
-//     */
-//    public function setProductInfo(?ProductInfo $productInfo): void
-//    {
-//        $this->productInfo = $productInfo;
-//    }
-
-//    /**
-//     * @return Collection
-//     */
-//    public function getTest(): Collection
-//    {
-//        return $this->test;
-//    }
-//
-//    /**
-//     * @param Collection $test
-//     */
-//    public function setTest(Collection $test): void
-//    {
-//        $this->test = $test;
-//    }
-
+    public function setCategory(?Category $category): void
+    {
+        $this->category = $category;
+    }
 }
