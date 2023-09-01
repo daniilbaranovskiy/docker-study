@@ -6,38 +6,48 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Action\CreateProductAction;
+use App\EntityListener\ProductEntityListener;
 use App\Repository\ProductRepository;
+use App\Validator\Constraints\ProductConstraints;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-//#[ProductConstraints]
+#[ProductConstraints]
 #[ApiResource(
     collectionOperations: [
         "get" => [
             "method" => "GET",
             "security" => "is_granted('" . User::ROLE_USER . "')",
-            "normalization_context" => ["groups" => "get:collection:product"]
+            "normalization_context" => ["groups" => ["get:collection:product"]]
         ],
         "post" => [
             "method" => "POST",
             "security" => "is_granted('" . User::ROLE_USER . "')",
-            "denormalization_context" => ["groups" => "post:collection:product"],
-            "normalization_context" => ["groups" => "get:collection:product"]
-        ],
+            "denormalization_context" => ["groups" => ["post:collection:product"]],
+            "normalization_context" => ["groups" => ["get:item:product"]],
+            "controller" => CreateProductAction::class
+        ]
     ],
     itemOperations: [
         "get" => [
             "method" => "GET",
-            "normalization_context" => ["groups" => "get:item:product"]
+            "normalization_context" => ["groups" => ["get:item:product"]]
         ]
-    ], attributes: [
-    "security" => "is_granted('" . User::ROLE_ADMIN . "') or is_granted('" . User::ROLE_USER . "')"
-]
+    ],
+    attributes: [
+        "security" => "is_granted('" . User::ROLE_ADMIN . "') or is_granted('" . User::ROLE_USER . "')"
+    ]
 )]
-#[ApiFilter(SearchFilter::class, properties: ["name"=>"partial", "description"])]
+#[ApiFilter(SearchFilter::class, properties: [
+    "name" => "partial",
+    "description"
+])]
 #[ApiFilter(RangeFilter::class, properties: ['price'])]
+#[ORM\EntityListeners([ProductEntityListener::class])]
 class Product
 {
     #[ORM\Id]
@@ -47,7 +57,9 @@ class Product
         "get:item:product"
     ])]
     private ?int $id = null;
+
     #[ORM\Column(length: 255)]
+    #[NotBlank]
     #[Groups([
         "get:collection:product",
         "get:item:product",
@@ -55,12 +67,11 @@ class Product
     ])]
     private ?string $name = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     #[Groups([
         "get:item:product",
         "post:collection:product"
-
     ])]
-    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     private ?string $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -74,15 +85,8 @@ class Product
     #[Groups([
         "get:item:product",
         "post:collection:product"
-
     ])]
     private ?Category $category = null;
-
-//    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
-//    private ?ProductInfo $productInfo = null;
-
-//    #[ORM\ManyToMany(targetEntity: Test::class)]
-//    private Collection $test;
 
     /**
      * @return int|null
@@ -159,9 +163,12 @@ class Product
 
     /**
      * @param Category|null $category
+     * @return Product
      */
-    public function setCategory(?Category $category): void
+    public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
     }
 }

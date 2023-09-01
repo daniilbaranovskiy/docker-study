@@ -23,25 +23,11 @@ class TmpController extends AbstractController
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var DenormalizerInterface
-     */
-    private DenormalizerInterface $denormalizer;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private ValidatorInterface $validator;
-
-    /**
      * @param EntityManagerInterface $entityManager
-     * @param DenormalizerInterface $denormalizer
-     * @param ValidatorInterface $validator
      */
-    public function __construct(EntityManagerInterface $entityManager, DenormalizerInterface $denormalizer, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->denormalizer = $denormalizer;
-        $this->validator = $validator;
     }
 
     /**
@@ -51,20 +37,7 @@ class TmpController extends AbstractController
     #[Route(path: "tmp", name: "app_tmp")]
     public function tmp(Request $request): JsonResponse
     {
-        //$user = $this->getUser();
-        $requestData = json_decode($request->getContent(), true);
-        $products = $this->denormalizer->denormalize($requestData, Product::class, "array");
-//        $products = $this->entityManager->getRepository(Product::class)->findAll();
-//        if (in_array(User::ROLE_ADMIN, $user->getRoles())) {
-//            return new JsonResponse($products);
-//        }
-        $errors = $this->validator->validate($products);
-        if (count($errors) > 0) {
-            return new JsonResponse((string)$errors);
-
-        }
-        return new JsonResponse();
-
+        return new JsonResponse("test");
     }
 
     /**
