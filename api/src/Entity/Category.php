@@ -13,6 +13,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource]
 class Category
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -21,6 +24,9 @@ class Category
     ])]
     private ?int $id = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     #[Groups([
         "get:item:product",
@@ -28,9 +34,15 @@ class Category
     ])]
     private ?string $name = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
+    /**
+     * @var Collection
+     */
     #[ORM\OneToMany(mappedBy: "category", targetEntity: Product::class)]
     private Collection $products;
 

@@ -2,18 +2,11 @@
 
 namespace App\Controller;
 
-
-use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-
 
 class TmpController extends AbstractController
 {
@@ -38,24 +31,5 @@ class TmpController extends AbstractController
     public function tmp(Request $request): JsonResponse
     {
         return new JsonResponse("test");
-    }
-
-    /**
-     * @param array $products
-     * @return array
-     */
-    public function fetchProductsForUser(array $products): array
-    {
-        $fetchedProductsForUser = null;
-
-        /** @var Product $product */
-        foreach ($products as $product) {
-            $tmpProductData = $product->jsonSerialize();
-
-            unset($tmpProductData['description']);
-            $fetchedProductsForUser[] = $tmpProductData;
-
-        }
-        return $fetchedProductsForUser;
     }
 }

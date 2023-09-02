@@ -50,6 +50,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[ORM\EntityListeners([ProductEntityListener::class])]
 class Product
 {
+    /**
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -58,6 +61,9 @@ class Product
     ])]
     private ?int $id = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     #[NotBlank]
     #[Groups([
@@ -67,6 +73,9 @@ class Product
     ])]
     private ?string $name = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     #[Groups([
         "get:item:product",
@@ -74,6 +83,9 @@ class Product
     ])]
     private ?string $price = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
         "get:item:product",
@@ -81,6 +93,9 @@ class Product
     ])]
     private ?string $description = null;
 
+    /**
+     * @var Category|null
+     */
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
     #[Groups([
         "get:item:product",

@@ -11,14 +11,12 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ProductEvent extends Event
 {
-
     public const PRODUCT_CREATE = 'product.create';
 
     /**
      * @var Product
      */
     private Product $product;
-
 
     /**
      * @param Product $product
@@ -35,5 +33,4 @@ class ProductEvent extends Event
     {
         return $this->product;
     }
-
 }

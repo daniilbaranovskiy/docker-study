@@ -51,7 +51,6 @@ class TestCommand extends Command
 //
 //        $this->eventDispatcher->dispatch($productEvent, ProductEvent::PRODUCT_CREATE);
 
-
         return Command::SUCCESS;
     }
 }

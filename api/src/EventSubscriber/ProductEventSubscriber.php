@@ -27,9 +27,8 @@ class ProductEventSubscriber implements EventSubscriberInterface
      * @param ProductEvent $event
      * @return void
      */
-    public function onObjectCreate(ProductEvent $event)
+    public function onObjectCreate(ProductEvent $event): void
     {
         $test = $event->getProduct();
-        dd(1);
     }
 }

@@ -41,11 +41,14 @@ class CategoryController extends AbstractController
         if (!isset($requestData['name'], $requestData['type'])) {
             throw new Exception("Invalid request data");
         }
+
         $category = new Category();
         $category->setName($requestData['name']);
         $category->setType($requestData['type']);
+
         $this->entityManager->persist($category);
         $this->entityManager->flush();
+
         return new JsonResponse($category, Response::HTTP_CREATED);
     }
 
@@ -115,7 +118,6 @@ class CategoryController extends AbstractController
         }
 
         $this->entityManager->remove($product);
-
         $this->entityManager->flush();
 
         return new JsonResponse();
