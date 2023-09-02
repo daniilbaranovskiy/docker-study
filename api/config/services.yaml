@@ -26,7 +26,7 @@ services:
 
     App\Action\:
         resource: '../src/Action/'
-        tags: [ 'controller.service_arguments' ]
+        tags: ['controller.service_arguments']
 
     App\EntityListener\ProductEntityListener:
         arguments:

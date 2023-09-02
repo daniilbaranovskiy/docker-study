@@ -22,6 +22,11 @@ class ProductEventSubscriber implements EventSubscriberInterface
             ProductEvent::PRODUCT_CREATE => 'onObjectCreate'
         ];
     }
+
+    /**
+     * @param ProductEvent $event
+     * @return void
+     */
     public function onObjectCreate(ProductEvent $event)
     {
         $test = $event->getProduct();
