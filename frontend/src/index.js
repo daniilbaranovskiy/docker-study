@@ -10,7 +10,7 @@ root.render(
     <React.StrictMode>
         {arr.map(
             (value, index) =>
-                <Counter key={index} color={'red'}></Counter>
+                <Counter key={index} value={value}/>
         )}
     </React.StrictMode>
 );
