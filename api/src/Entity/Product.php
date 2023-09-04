@@ -89,6 +89,16 @@ class Product
     private ?Category $category = null;
 
     /**
+     * @var User|null
+     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "products")]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+    ])]
+    private ?User $user = null;
+
+    /**
      * @return int|null
      */
     public function getId(): ?int
@@ -171,4 +181,25 @@ class Product
 
         return $this;
     }
+
+    /**
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User|null $user
+     * @return $this
+     */
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+
+    }
+
 }
