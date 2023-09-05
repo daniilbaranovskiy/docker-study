@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     collectionOperations: [
         "get" => [
             "method" => "GET",
-            "security" => "is_granted('" . User::ROLE_USER . "')",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')",
             "normalization_context" => ["groups" => ["get:collection:product"]]
         ],
         "post" => [
