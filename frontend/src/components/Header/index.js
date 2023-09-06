@@ -1,6 +1,11 @@
+import {useParams} from "react-router-dom";
+
 function Header(props) {
+    const params = useParams()
+    const headerId = params.headerId;
     return <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container-fluid">
+            <h1>{headerId}</h1>
             <a className="navbar-brand" href="#">{props.title}</a>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"

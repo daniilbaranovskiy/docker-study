@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import styled from "styled-components";
 
 const StyledCounter = styled.div`
@@ -13,6 +13,13 @@ const StyledCounter = styled.div`
 
 function Counter({value = 0, padding = 20}) {
     const [currentValue, setValue] = useState(value);
+    useEffect(() => {
+        console.log("Counter mounted")
+
+        return () => {
+            console.log("Counter unmounted")
+        }
+    }, [])
 
     return (
         <StyledCounter
@@ -39,4 +46,5 @@ function Counter({value = 0, padding = 20}) {
         </StyledCounter>
     );
 }
+
 export default Counter;
