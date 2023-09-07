@@ -4,12 +4,14 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Action\CreateProductAction;
 use App\EntityListener\ProductEntityListener;
 use App\Repository\ProductRepository;
 use App\Validator\Constraints\ProductConstraints;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -44,9 +46,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     "name" => "partial",
-    "description"
 ])]
 #[ApiFilter(RangeFilter::class, properties: ['price'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
 #[ORM\EntityListeners([ProductEntityListener::class])]
 class Product
 {
@@ -69,6 +71,7 @@ class Product
 
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     #[Groups([
+        "get:collection:product",
         "get:item:product",
         "post:collection:product"
     ])]
@@ -76,6 +79,7 @@ class Product
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
+        "get:collection:product",
         "get:item:product",
         "post:collection:product"
     ])]
@@ -83,6 +87,7 @@ class Product
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
     #[Groups([
+        "get:collection:product",
         "get:item:product",
         "post:collection:product"
     ])]
@@ -97,6 +102,17 @@ class Product
         "post:collection:product"
     ])]
     private ?User $user = null;
+
+    /**
+     * @var DateTimeInterface|null
+     */
+    #[Groups([
+        "get:collection:product",
+        "get:item:product",
+        "post:collection:product"
+    ])]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $createdAt = null;
 
     /**
      * @return int|null
@@ -202,4 +218,22 @@ class Product
 
     }
 
+    /**
+     * @return DateTimeInterface|null
+     */
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTimeInterface|null $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(?DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
 }

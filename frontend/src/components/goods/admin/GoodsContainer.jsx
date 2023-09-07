@@ -20,31 +20,35 @@ const GoodsContainer = () => {
     const [paginationInfo, setPaginationInfo] = useState({
         totalItems: null,
         totalPageCount: null,
-        itemsPerPage: 10
+        itemsPerPage: 8
     });
 
     const [filterData, setFilterData] = useState({
         "page": checkFilterItem(searchParams, "page", 1, true),
         "name": checkFilterItem(searchParams, "name", null),
+        "price[gte]": checkFilterItem(searchParams, "price[gte]", null),
+        "price[lte]": checkFilterItem(searchParams, "price[lte]", null),
     });
     const fetchProducts = () => {
-        let filterUrl = fetchFilterData(filterData)
+        let filterUrl = fetchFilterData(filterData);
+
         navigate(filterUrl);
-
-        axios.get("/api/products" + filterUrl + "&itemsPerPage=" + paginationInfo.itemsPerPage, userAuthenticationConfig()).then(response => {
-            if (response.status === responseStatus.HTTP_OK && response.data["hydra:member"]) {
-                setGoods(response.data["hydra:member"]);
-                setPaginationInfo({
-                    ...paginationInfo,
-                    totalItems: response.data["hydra:totalItems"],
-                    totalPageCount: Math.ceil(response.data["hydra:totalItems"] / paginationInfo.itemsPerPage)
-                });
-            }
-        }).catch(error => {
-            console.log("error");
-        });
+        axios
+            .get("/api/products" + filterUrl + "&itemsPerPage=" + paginationInfo.itemsPerPage, userAuthenticationConfig())
+            .then((response) => {
+                if (response.status === responseStatus.HTTP_OK && response.data["hydra:member"]) {
+                    setGoods(response.data["hydra:member"]);
+                    setPaginationInfo({
+                        ...paginationInfo,
+                        totalItems: response.data["hydra:totalItems"],
+                        totalPageCount: Math.ceil(response.data["hydra:totalItems"] / paginationInfo.itemsPerPage),
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log("error");
+            });
     };
-
     const onChangePage = (event, page) => {
         setFilterData({...filterData, page: page});
     };
@@ -52,9 +56,7 @@ const GoodsContainer = () => {
     useEffect(() => {
         fetchProducts();
     }, [filterData]);
-
-    console.log(paginationInfo)
-
+    
     return (
         <>
             <Helmet>
