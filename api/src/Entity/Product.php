@@ -15,6 +15,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Positive;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ProductConstraints]
@@ -66,6 +67,7 @@ class Product
 
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     #[NotBlank]
+    #[Positive]
     #[Groups([
         "get:collection:product",
         "get:item:product",
