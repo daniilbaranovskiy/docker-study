@@ -33,6 +33,8 @@ const GoodsContainer = () => {
     const [filterData, setFilterData] = useState({
         "page": checkFilterItem(searchParams, "page", 1, true),
         "name": checkFilterItem(searchParams, "name", null),
+        "price[gte]": checkFilterItem(searchParams, "price[gte]", null),
+        "price[lte]": checkFilterItem(searchParams, "price[lte]", null),
     });
     const fetchProducts = () => {
         let filterUrl = fetchFilterData(filterData);
