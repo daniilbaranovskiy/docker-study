@@ -3,39 +3,32 @@
 namespace App\EntityListener;
 
 use App\Entity\Product;
-use Doctrine\ORM\Event\PostPersistEventArgs;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Symfony\Component\Security\Core\Security;
+
 
 class ProductEntityListener
 {
-    /**
-     * @param Product $product
-     * @param PostPersistEventArgs $eventArgs
-     * @return void
-     */
-    public function postPersist(Product $product, PostPersistEventArgs $eventArgs): void
-    {
-        $test = 1;
-    }
 
     /**
-     * @param Product $product
-     * @param LifecycleEventArgs $eventArgs
-     * @return void
+     * @var EntityManagerInterface
      */
-    public function postUpdate(Product $product, LifecycleEventArgs $eventArgs): void
-    {
-        $test = 1;
-    }
+    private EntityManagerInterface $entityManager;
+    /**
+     * @var Security
+     */
+    private Security $security;
 
     /**
-     * @param Product $product
-     * @param LifecycleEventArgs $eventArgs
-     * @return void
+     * @param EntityManagerInterface $entityManager
+     * @param Security $security
      */
-    public function preUpdate(Product $product, LifecycleEventArgs $eventArgs): void
+    public function __construct(EntityManagerInterface $entityManager, Security $security)
     {
-        $test = 1;
+        $this->entityManager = $entityManager;
+        $this->security = $security;
     }
 
     /**
@@ -45,6 +38,14 @@ class ProductEntityListener
      */
     public function prePersist(Product $product, LifecycleEventArgs $eventArgs): void
     {
-        $test = 1;
+        $currentDate = new \DateTime();
+        $timestampInMilliseconds = $currentDate->getTimestamp() * 1000;
+        $product->setCreatedAt($timestampInMilliseconds);
+
+        /** @var User $currentUser */
+        $currentUser = $this->security->getUser();
+        $user = $this->entityManager->getRepository(User::class)->find($currentUser->getId());
+
+        $product->setUser($user);
     }
 }

@@ -12,10 +12,18 @@ import "nprogress/nprogress.css";
 import "./assets/css/main.css";
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc'; // Подключаем плагин для работы с UTC
+import timezone from 'dayjs/plugin/timezone'; // Подключаем плагин для работы с часовыми поясами
 
 export const AppContext = createContext({});
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 function App() {
+
+    dayjs.tz.setDefault('Europe/Kiev');
+
     const [authenticated, setAuthenticated] = useState(localStorage.getItem("token"));
     const location = useLocation();
     const navigate = useNavigate();
@@ -59,6 +67,8 @@ function App() {
     useEffect(() => {
         handleOnIdle();
     }, []);
+
+
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>

@@ -23,11 +23,16 @@ const GoodsContainer = () => {
         itemsPerPage: 8
     });
 
+    const [productFormData, setProductFormData] = useState({
+        name: "",
+        price: "",
+        description: "",
+        category: "",
+    });
+
     const [filterData, setFilterData] = useState({
         "page": checkFilterItem(searchParams, "page", 1, true),
         "name": checkFilterItem(searchParams, "name", null),
-        "price[gte]": checkFilterItem(searchParams, "price[gte]", null),
-        "price[lte]": checkFilterItem(searchParams, "price[lte]", null),
     });
     const fetchProducts = () => {
         let filterUrl = fetchFilterData(filterData);
@@ -49,6 +54,18 @@ const GoodsContainer = () => {
                 console.log("error");
             });
     };
+    const createProduct = (newProductData) => {
+        axios
+            .post("/api/products", newProductData, userAuthenticationConfig())
+            .then((response) => {
+                if (response.status === responseStatus.HTTP_CREATED) {
+                    fetchProducts();
+                }
+            })
+            .catch((error) => {
+                console.log("error");
+            });
+    };
     const onChangePage = (event, page) => {
         setFilterData({...filterData, page: page});
     };
@@ -56,7 +73,7 @@ const GoodsContainer = () => {
     useEffect(() => {
         fetchProducts();
     }, [filterData]);
-    
+
     return (
         <>
             <Helmet>
@@ -73,7 +90,13 @@ const GoodsContainer = () => {
             <Typography variant="h4" component="h1" mt={1}>
                 Goods
             </Typography>
-            <GoodsFilter filterData={filterData} setFilterData={setFilterData}/>
+            <GoodsFilter
+                filterData={filterData}
+                setFilterData={setFilterData}
+                productFormData={productFormData}
+                setProductFormData={setProductFormData}
+                onCreateProduct={createProduct}
+            />
             <GoodsList goods={goods}/>
             {paginationInfo.totalPageCount &&
                 <Pagination

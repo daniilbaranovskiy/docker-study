@@ -1,8 +1,9 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
-function formatDate(date) {
-    const formattedDate = dayjs(date);
+function formatDate(timestampInMilliseconds) {
+    const formattedDate = dayjs(timestampInMilliseconds);
 
-    return formattedDate.format("YYYY-MM-DD");
+    return formattedDate.format('YYYY-MM-DD HH:mm');
 }
+
 export default formatDate;

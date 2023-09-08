@@ -11,7 +11,6 @@ use App\Action\CreateProductAction;
 use App\EntityListener\ProductEntityListener;
 use App\Repository\ProductRepository;
 use App\Validator\Constraints\ProductConstraints;
-use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -28,7 +27,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         ],
         "post" => [
             "method" => "POST",
-            "security" => "is_granted('" . User::ROLE_USER . "')",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')",
             "denormalization_context" => ["groups" => ["post:collection:product"]],
             "normalization_context" => ["groups" => ["get:item:product"]],
             "controller" => CreateProductAction::class
@@ -40,15 +39,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
             "normalization_context" => ["groups" => ["get:item:product"]]
         ]
     ],
-    attributes: [
-        "security" => "is_granted('" . User::ROLE_ADMIN . "') or is_granted('" . User::ROLE_USER . "')"
-    ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     "name" => "partial",
 ])]
-#[ApiFilter(RangeFilter::class, properties: ['price'])]
-#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
+#[ApiFilter(RangeFilter::class, properties: ['price', 'createdAt'])]
 #[ORM\EntityListeners([ProductEntityListener::class])]
 class Product
 {
@@ -70,6 +65,7 @@ class Product
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
+    #[NotBlank]
     #[Groups([
         "get:collection:product",
         "get:item:product",
@@ -78,6 +74,7 @@ class Product
     private ?string $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank]
     #[Groups([
         "get:collection:product",
         "get:item:product",
@@ -97,22 +94,17 @@ class Product
      * @var User|null
      */
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "products")]
-    #[Groups([
-        "get:item:product",
-        "post:collection:product"
-    ])]
     private ?User $user = null;
 
     /**
-     * @var DateTimeInterface|null
+     * @var int|null
      */
     #[Groups([
         "get:collection:product",
         "get:item:product",
-        "post:collection:product"
     ])]
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?int $createdAt = null;
 
     /**
      * @return int|null
@@ -219,21 +211,21 @@ class Product
     }
 
     /**
-     * @return DateTimeInterface|null
-     */
-    public function getCreatedAt(): ?DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param DateTimeInterface|null $createdAt
+     * @param int|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(?DateTimeInterface $createdAt): self
+    public function setCreatedAt(?int $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCreatedAt(): ?int
+    {
+        return $this->createdAt;
     }
 }
