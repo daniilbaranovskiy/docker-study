@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Entity\Product;
+use App\Services\ValidatorServices;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -46,6 +47,7 @@ class TmpController extends AbstractController
      */
     public function fetchProductsForUser(array $products): array
     {
+        $test = ValidatorServices::test();
         $fetchedProductsForUser = null;
 
         /** @var Product $product */
