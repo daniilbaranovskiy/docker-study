@@ -10,34 +10,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public const ROLE_USER = "ROLE_USER";
-    public const ROLE_ADMIN = "ROLE_ADMIN";
-
-
-    /**
-     * @var int|null
-     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    /**
-     * @var array
-     */
     #[ORM\Column]
     private array $roles = [];
-
-    public function __construct()
-    {
-        $this->roles = [self::ROLE_USER];
-    }
 
     /**
      * @var string The hashed password
@@ -50,18 +32,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     * @return $this
-     */
     public function setEmail(string $email): static
     {
         $this->email = $email;
@@ -76,7 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string)$this->email;
+        return (string) $this->email;
     }
 
     /**
@@ -84,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUsername(): string
     {
-        return (string)$this->email;
+        return (string) $this->email;
     }
 
     /**
@@ -92,13 +67,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        return $this->roles;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
-    /**
-     * @param array $roles
-     * @return $this
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -114,10 +89,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    /**
-     * @param string $password
-     * @return $this
-     */
     public function setPassword(string $password): static
     {
         $this->password = $password;
